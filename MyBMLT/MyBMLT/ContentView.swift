@@ -1,4 +1,5 @@
 import SwiftUI
+import MapKit
 
 struct ContentView: View {
     @StateObject private var service = BMLTService()
@@ -171,11 +172,26 @@ struct MeetingRow: View {
 
             if meeting.venueType != 2 {
                 if !meeting.street.isEmpty || !meeting.city.isEmpty || !meeting.zip.isEmpty {
-                    Text([meeting.street, meeting.city, meeting.zip]
-                        .filter { !$0.isEmpty }
-                        .joined(separator: ", "))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        Text([meeting.street, meeting.city, meeting.zip]
+                            .filter { !$0.isEmpty }
+                            .joined(separator: ", "))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        Spacer()
+
+                        if let lat = meeting.latitude, let lon = meeting.longitude {
+                            Button {
+                                openInMaps(lat: lat, lon: lon, name: meeting.name)
+                            } label: {
+                                Image(systemName: "map")
+                                    .font(.caption)
+                                    .foregroundStyle(.blue)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
                 }
             }
 
@@ -215,6 +231,14 @@ struct MeetingRow: View {
         case 3: return .orange
         default: return .secondary
         }
+    }
+
+    private func openInMaps(lat: Double, lon: Double, name: String) {
+        let coords = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        let placemark = MKPlacemark(coordinate: coords)
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = name
+        mapItem.openInMaps()
     }
 }
 

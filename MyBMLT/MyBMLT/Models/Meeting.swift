@@ -12,7 +12,9 @@ struct Meeting: Identifiable, Codable {
     let virtualLink: String?
     let formats: [String]
     let serviceBodyId: Int
-    let venueType: Int        // 1=in-person, 2=virtual, 3=hybrid
+    let venueType: Int
+    let latitude: Double?
+    let longitude: Double?
 
     var isWheelchairAccessible: Bool {
         formats.contains(where: { ["WC","WCAB","HC"].contains($0) })
