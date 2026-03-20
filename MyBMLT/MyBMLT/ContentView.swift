@@ -16,7 +16,8 @@ struct ContentView: View {
             let matchesSearch = searchText.isEmpty ||
                 meeting.name.localizedCaseInsensitiveContains(searchText) ||
                 meeting.city.localizedCaseInsensitiveContains(searchText) ||
-                meeting.street.localizedCaseInsensitiveContains(searchText)
+                meeting.street.localizedCaseInsensitiveContains(searchText) ||
+                meeting.zip.localizedCaseInsensitiveContains(searchText)
             return matchesDay && matchesArea && matchesVenue && matchesSearch
         }
     }
