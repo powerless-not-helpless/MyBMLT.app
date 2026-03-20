@@ -1,0 +1,45 @@
+import Foundation
+
+struct BMLTResponse: Codable {
+    let meetings: [BMLTMeetingRaw]
+}
+
+struct BMLTMeetingRaw: Codable {
+    let id_bigint: String?
+    let meeting_name: String?
+    let weekday_tinyint: String?
+    let start_time: String?
+    let location_text: String?
+    let location_street: String?
+    let location_municipality: String?
+    let virtual_meeting_link: String?
+    let service_body_bigint: String?
+    let formats: String?
+
+    func toMeeting() -> Meeting? {
+        guard
+            let idStr = id_bigint,
+            let id    = Int(idStr),
+            let name  = meeting_name, !name.isEmpty,
+            let wdStr = weekday_tinyint,
+            let wd    = Int(wdStr)
+        else { return nil }
+
+        let formatList = formats?
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) } ?? []
+
+        return Meeting(
+            id:            id,
+            name:          name,
+            weekday:       wd,
+            startTime:     start_time ?? "",
+            locationName:  location_text ?? "",
+            street:        location_street ?? "",
+            city:          location_municipality ?? "",
+            virtualLink:   virtual_meeting_link,
+            formats:       formatList,
+            serviceBodyId: Int(service_body_bigint ?? "") ?? 0
+        )
+    }
+}
