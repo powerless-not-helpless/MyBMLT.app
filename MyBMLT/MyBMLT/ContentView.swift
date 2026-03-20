@@ -5,16 +5,18 @@ struct ContentView: View {
     @State private var searchText = ""
     @State private var selectedDay: Int? = nil
     @State private var selectedArea: Int = -1
+    @State private var selectedVenue: Int = -1
 
     var filteredMeetings: [Meeting] {
         service.meetings.filter { meeting in
-            let matchesDay    = selectedDay == nil || meeting.weekday == selectedDay
-            let matchesArea   = selectedArea == -1  || meeting.serviceBodyId == selectedArea
+            let matchesDay    = selectedDay   == nil || meeting.weekday        == selectedDay
+            let matchesArea   = selectedArea  == -1  || meeting.serviceBodyId  == selectedArea
+            let matchesVenue  = selectedVenue == -1  || meeting.venueType      == selectedVenue
             let matchesSearch = searchText.isEmpty ||
                 meeting.name.localizedCaseInsensitiveContains(searchText) ||
                 meeting.city.localizedCaseInsensitiveContains(searchText) ||
                 meeting.street.localizedCaseInsensitiveContains(searchText)
-            return matchesDay && matchesArea && matchesSearch
+            return matchesDay && matchesArea && matchesVenue && matchesSearch
         }
     }
 
@@ -22,11 +24,8 @@ struct ContentView: View {
         NavigationSplitView {
             VStack(spacing: 0) {
 
-                // Area filter dropdown
+                // Area + Venue filter dropdowns
                 HStack {
-                    Text("Area:")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
                     Picker("Area", selection: $selectedArea) {
                         Text("All Areas").tag(-1)
                         ForEach(ServiceArea.all) { area in
@@ -34,7 +33,16 @@ struct ContentView: View {
                         }
                     }
                     .pickerStyle(.menu)
+
                     Spacer()
+
+                    Picker("Venue", selection: $selectedVenue) {
+                        Text("All").tag(-1)
+                        Text("In-Person").tag(1)
+                        Text("Virtual").tag(2)
+                        Text("Hybrid").tag(3)
+                    }
+                    .pickerStyle(.menu)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
@@ -146,18 +154,41 @@ struct MeetingRow: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            if !meeting.locationName.isEmpty {
+
+            Text(meeting.venueLabel)
+                .font(.caption2)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(venueBadgeColor(meeting.venueType).opacity(0.2))
+                .foregroundStyle(venueBadgeColor(meeting.venueType))
+                .clipShape(Capsule())
+
+            if meeting.venueType != 2 && !meeting.locationName.isEmpty {
                 Text(meeting.locationName)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            if !meeting.street.isEmpty || !meeting.city.isEmpty || !meeting.zip.isEmpty {
-                Text([meeting.street, meeting.city, meeting.zip]
-                    .filter { !$0.isEmpty }
-                    .joined(separator: ", "))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+
+            if meeting.venueType != 2 {
+                if !meeting.street.isEmpty || !meeting.city.isEmpty || !meeting.zip.isEmpty {
+                    Text([meeting.street, meeting.city, meeting.zip]
+                        .filter { !$0.isEmpty }
+                        .joined(separator: ", "))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
+
+            if meeting.venueType == 2 || meeting.venueType == 3 {
+                if let link = meeting.virtualLink, !link.isEmpty {
+                    Text(link)
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            }
+
             HStack {
                 ForEach(meeting.formats.prefix(4), id: \.self) { format in
                     Text(format)
@@ -175,6 +206,15 @@ struct MeetingRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private func venueBadgeColor(_ type: Int) -> Color {
+        switch type {
+        case 1: return .green
+        case 2: return .blue
+        case 3: return .orange
+        default: return .secondary
+        }
     }
 }
 

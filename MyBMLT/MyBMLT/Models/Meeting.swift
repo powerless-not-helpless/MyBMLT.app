@@ -12,6 +12,7 @@ struct Meeting: Identifiable, Codable {
     let virtualLink: String?
     let formats: [String]
     let serviceBodyId: Int
+    let venueType: Int        // 1=in-person, 2=virtual, 3=hybrid
 
     var isWheelchairAccessible: Bool {
         formats.contains(where: { ["WC","WCAB","HC"].contains($0) })
@@ -31,5 +32,14 @@ struct Meeting: Identifiable, Codable {
         let period = hour >= 12 ? "PM" : "AM"
         let h = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour)
         return String(format: "%d:%02d %@", h, minute, period)
+    }
+
+    var venueLabel: String {
+        switch venueType {
+        case 1: return "In-Person"
+        case 2: return "Virtual"
+        case 3: return "Hybrid"
+        default: return "Unknown"
+        }
     }
 }

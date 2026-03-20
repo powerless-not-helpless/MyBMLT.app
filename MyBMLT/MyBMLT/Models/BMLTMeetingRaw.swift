@@ -16,6 +16,7 @@ struct BMLTMeetingRaw: Codable {
     let virtual_meeting_link: String?
     let service_body_bigint: String?
     let formats: String?
+    let venue_type: String?
 
     func toMeeting() -> Meeting? {
         guard
@@ -41,7 +42,8 @@ struct BMLTMeetingRaw: Codable {
             zip:           location_postal_code_1 ?? "",
             virtualLink:   virtual_meeting_link,
             formats:       formatList,
-            serviceBodyId: Int(service_body_bigint ?? "") ?? 0
+            serviceBodyId: Int(service_body_bigint ?? "") ?? 0,
+            venueType:     Int(venue_type ?? "") ?? 1
         )
     }
 }
