@@ -12,6 +12,7 @@ struct BMLTMeetingRaw: Codable {
     let location_text: String?
     let location_street: String?
     let location_municipality: String?
+    let location_postal_code_1: String?
     let virtual_meeting_link: String?
     let service_body_bigint: String?
     let formats: String?
@@ -37,6 +38,7 @@ struct BMLTMeetingRaw: Codable {
             locationName:  location_text ?? "",
             street:        location_street ?? "",
             city:          location_municipality ?? "",
+            zip:           location_postal_code_1 ?? "",
             virtualLink:   virtual_meeting_link,
             formats:       formatList,
             serviceBodyId: Int(service_body_bigint ?? "") ?? 0

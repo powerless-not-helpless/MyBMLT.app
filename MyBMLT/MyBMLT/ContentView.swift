@@ -4,21 +4,43 @@ struct ContentView: View {
     @StateObject private var service = BMLTService()
     @State private var searchText = ""
     @State private var selectedDay: Int? = nil
+    @State private var selectedArea: Int = -1
 
     var filteredMeetings: [Meeting] {
         service.meetings.filter { meeting in
-            let matchesDay = selectedDay == nil || meeting.weekday == selectedDay
+            let matchesDay    = selectedDay == nil || meeting.weekday == selectedDay
+            let matchesArea   = selectedArea == -1  || meeting.serviceBodyId == selectedArea
             let matchesSearch = searchText.isEmpty ||
                 meeting.name.localizedCaseInsensitiveContains(searchText) ||
                 meeting.city.localizedCaseInsensitiveContains(searchText) ||
                 meeting.street.localizedCaseInsensitiveContains(searchText)
-            return matchesDay && matchesSearch
+            return matchesDay && matchesArea && matchesSearch
         }
     }
 
     var body: some View {
         NavigationSplitView {
             VStack(spacing: 0) {
+
+                // Area filter dropdown
+                HStack {
+                    Text("Area:")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Picker("Area", selection: $selectedArea) {
+                        Text("All Areas").tag(-1)
+                        ForEach(ServiceArea.all) { area in
+                            Text(area.shortName).tag(area.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+
+                // Day filter chips
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         DayChip(label: "All", tag: nil, selected: selectedDay)
@@ -31,6 +53,7 @@ struct ContentView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 8)
                 }
+
                 Divider()
 
                 if service.isLoading && service.meetings.isEmpty {
@@ -57,7 +80,7 @@ struct ContentView: View {
 
                 if let lastUpdated = service.lastUpdated {
                     HStack {
-                        Text("Found \(service.meetings.count) Meetings as of \(lastUpdated.formatted(date: .omitted, time: .shortened))")
+                        Text("Found \(filteredMeetings.count) Meetings as of \(lastUpdated.formatted(date: .omitted, time: .shortened))")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -123,9 +146,18 @@ struct MeetingRow: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            Text("\(meeting.locationName) — \(meeting.city)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            if !meeting.locationName.isEmpty {
+                Text(meeting.locationName)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            if !meeting.street.isEmpty || !meeting.city.isEmpty || !meeting.zip.isEmpty {
+                Text([meeting.street, meeting.city, meeting.zip]
+                    .filter { !$0.isEmpty }
+                    .joined(separator: ", "))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
             HStack {
                 ForEach(meeting.formats.prefix(4), id: \.self) { format in
                     Text(format)

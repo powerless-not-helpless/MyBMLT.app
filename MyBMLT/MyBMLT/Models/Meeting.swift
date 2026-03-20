@@ -8,6 +8,7 @@ struct Meeting: Identifiable, Codable {
     let locationName: String
     let street: String
     let city: String
+    let zip: String
     let virtualLink: String?
     let formats: [String]
     let serviceBodyId: Int
