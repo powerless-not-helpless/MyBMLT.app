@@ -9,17 +9,22 @@ struct ContentView: View {
     @State private var selectedVenue: Int = -1
 
     var filteredMeetings: [Meeting] {
-        service.meetings.filter { meeting in
-            let matchesDay    = selectedDay   == nil || meeting.weekday        == selectedDay
-            let matchesArea   = selectedArea  == -1  || meeting.serviceBodyId  == selectedArea
-            let matchesVenue  = selectedVenue == -1  || meeting.venueType      == selectedVenue
-            let matchesSearch = searchText.isEmpty ||
-                meeting.name.localizedCaseInsensitiveContains(searchText) ||
-                meeting.city.localizedCaseInsensitiveContains(searchText) ||
-                meeting.street.localizedCaseInsensitiveContains(searchText) ||
-                meeting.zip.localizedCaseInsensitiveContains(searchText)
-            return matchesDay && matchesArea && matchesVenue && matchesSearch
-        }
+        service.meetings
+            .filter { meeting in
+                let matchesDay    = selectedDay   == nil || meeting.weekday        == selectedDay
+                let matchesArea   = selectedArea  == -1  || meeting.serviceBodyId  == selectedArea
+                let matchesVenue  = selectedVenue == -1  || meeting.venueType      == selectedVenue
+                let matchesSearch = searchText.isEmpty ||
+                    meeting.name.localizedCaseInsensitiveContains(searchText) ||
+                    meeting.city.localizedCaseInsensitiveContains(searchText) ||
+                    meeting.street.localizedCaseInsensitiveContains(searchText) ||
+                    meeting.zip.localizedCaseInsensitiveContains(searchText)
+                return matchesDay && matchesArea && matchesVenue && matchesSearch
+            }
+            .sorted {
+                if $0.weekday != $1.weekday { return $0.weekday < $1.weekday }
+                return $0.startTime < $1.startTime
+            }
     }
 
     var body: some View {
