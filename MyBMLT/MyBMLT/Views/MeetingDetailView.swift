@@ -26,6 +26,10 @@ struct MeetingDetailView: View {
             }
         }
 
+        if !meeting.formats.isEmpty {
+            lines.append("Formats: \(meeting.formats.joined(separator: ", "))")
+        }
+
         return lines.joined(separator: "\n")
     }
 
