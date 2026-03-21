@@ -209,7 +209,7 @@ struct MeetingRow: View {
 
             if meeting.venueType == 2 || meeting.venueType == 3 {
                 if let link = meeting.virtualLink, !link.isEmpty {
-                    Text(link)
+                    Text(link.replacingOccurrences(of: " ", with: ""))
                         .font(.caption)
                         .foregroundStyle(.blue)
                         .lineLimit(1)
@@ -246,11 +246,11 @@ struct MeetingRow: View {
     }
 
     private func openInMaps(lat: Double, lon: Double, name: String) {
-        let coords = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-        let placemark = MKPlacemark(coordinate: coords)
-        let mapItem = MKMapItem(placemark: placemark)
-        mapItem.name = name
-        mapItem.openInMaps()
+        let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "maps://?q=\(encoded)&ll=\(lat),\(lon)"
+        if let url = URL(string: urlString) {
+            NSWorkspace.shared.open(url)
+        }
     }
 }
 

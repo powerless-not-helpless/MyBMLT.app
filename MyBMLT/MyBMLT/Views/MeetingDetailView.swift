@@ -86,15 +86,18 @@ struct MeetingDetailView: View {
                             Button {
                                 openZoom(link: link)
                             } label: {
-                                Label("Join Zoom Meeting", systemImage: "video.fill")
+                                Label("Join Meeting", systemImage: "video.fill")
                                     .font(.subheadline)
                             }
                             .buttonStyle(.borderedProminent)
 
-                            Text(link)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
+                            Text(
+                                (link.components(separatedBy: "?pwd=").first ?? link)
+                                    .replacingOccurrences(of: " ", with: "")
+                            )
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
                         }
 
                         if let info = meeting.virtualInfo,
@@ -142,11 +145,11 @@ struct MeetingDetailView: View {
     }
 
     private func openInMaps(lat: Double, lon: Double, name: String) {
-        let coords = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-        let placemark = MKPlacemark(coordinate: coords)
-        let mapItem = MKMapItem(placemark: placemark)
-        mapItem.name = name
-        mapItem.openInMaps()
+        let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "maps://?q=\(encoded)&ll=\(lat),\(lon)"
+        if let url = URL(string: urlString) {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func openZoom(link: String) {
