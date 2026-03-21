@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var selectedDay: Int? = nil
     @State private var selectedArea: Int = -1
     @State private var selectedVenue: Int = -1
+    @State private var selectedMeeting: Meeting? = nil
 
     var filteredMeetings: [Meeting] {
         service.meetings
@@ -87,8 +88,9 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    List(filteredMeetings) { meeting in
+                    List(filteredMeetings, selection: $selectedMeeting) { meeting in
                         MeetingRow(meeting: meeting)
+                            .tag(meeting)
                     }
                     .listStyle(.plain)
                 }
@@ -118,8 +120,12 @@ struct ContentView: View {
             .task { await service.loadMeetings() }
 
         } detail: {
-            Text("Select a meeting")
-                .foregroundStyle(.secondary)
+            if let meeting = selectedMeeting {
+                MeetingDetailView(meeting: meeting)
+            } else {
+                Text("Select a meeting")
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 

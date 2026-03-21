@@ -1,15 +1,17 @@
 import Foundation
 
-struct Meeting: Identifiable, Codable {
+struct Meeting: Identifiable, Codable, Hashable {
     let id: Int
     let name: String
     let weekday: Int
     let startTime: String
+    let duration: String
     let locationName: String
     let street: String
     let city: String
     let zip: String
     let virtualLink: String?
+    let virtualInfo: String?
     let formats: [String]
     let serviceBodyId: Int
     let venueType: Int
@@ -36,6 +38,20 @@ struct Meeting: Identifiable, Codable {
         return String(format: "%d:%02d %@", h, minute, period)
     }
 
+    var formattedDuration: String {
+        let parts = duration.split(separator: ":").map { String($0) }
+        guard parts.count >= 2,
+              let hours = Int(parts[0]),
+              let minutes = Int(parts[1]) else { return duration }
+        if hours > 0 && minutes > 0 {
+            return "\(hours) hr \(minutes) min"
+        } else if hours > 0 {
+            return "\(hours) hr"
+        } else {
+            return "\(minutes) min"
+        }
+    }
+
     var venueLabel: String {
         switch venueType {
         case 1: return "In-Person"
@@ -43,5 +59,9 @@ struct Meeting: Identifiable, Codable {
         case 3: return "Hybrid"
         default: return "Unknown"
         }
+    }
+
+    var areaName: String {
+        ServiceArea.all.first(where: { $0.id == serviceBodyId })?.fullName ?? "Unknown"
     }
 }
