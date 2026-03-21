@@ -3,19 +3,59 @@ import MapKit
 
 struct MeetingDetailView: View {
     let meeting: Meeting
+    @State private var copied = false
+
+    var clipboardText: String {
+        var lines: [String] = []
+        lines.append(meeting.weekdayName)
+        lines.append("\(meeting.name) at \(meeting.formattedTime)")
+
+        if meeting.venueType != 2 {
+            let addressParts = [meeting.street, meeting.city, meeting.zip]
+                .filter { !$0.isEmpty }
+            if !addressParts.isEmpty {
+                lines.append(addressParts.joined(separator: ", "))
+            }
+        }
+
+        if meeting.venueType == 2 || meeting.venueType == 3 {
+            if let link = meeting.virtualLink, !link.isEmpty {
+                let cleanedLink = (link.components(separatedBy: "?pwd=").first ?? link)
+                    .replacingOccurrences(of: " ", with: "")
+                lines.append(cleanedLink)
+            }
+        }
+
+        return lines.joined(separator: "\n")
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                // Name + time
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(meeting.name)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    Text("\(meeting.weekdayName) \(meeting.formattedTime) · \(meeting.formattedDuration)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                // Name + time + copy button
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(meeting.name)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("\(meeting.weekdayName) \(meeting.formattedTime) · \(meeting.formattedDuration)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(clipboardText, forType: .string)
+                        copied = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            copied = false
+                        }
+                    } label: {
+                        Label(copied ? "Copied!" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.bordered)
                 }
 
                 Divider()
