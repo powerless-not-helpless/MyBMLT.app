@@ -3,6 +3,7 @@ import MapKit
 
 struct MeetingDetailView: View {
     let meeting: Meeting
+    @EnvironmentObject var favoritesService: FavoritesService
     @State private var copied = false
 
     var clipboardText: String {
@@ -37,7 +38,7 @@ struct MeetingDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                // Name + time + copy button
+                // Name + time + star + copy buttons
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(meeting.name)
@@ -48,6 +49,14 @@ struct MeetingDetailView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
+                    Button {
+                        favoritesService.toggle(meeting)
+                    } label: {
+                        Image(systemName: favoritesService.isFavorite(meeting) ? "star.fill" : "star")
+                            .foregroundStyle(favoritesService.isFavorite(meeting) ? .yellow : .secondary)
+                    }
+                    .buttonStyle(.bordered)
+
                     Button {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(clipboardText, forType: .string)
@@ -202,7 +211,6 @@ struct MeetingDetailView: View {
         let host = webURL.host ?? ""
 
         if host.contains("zoom.us") {
-            // Zoom — try deep link first, fall back to browser
             let path = webURL.path
             let meetingId = path.components(separatedBy: "/").last ?? ""
             let queryItems = URLComponents(url: webURL, resolvingAgainstBaseURL: false)?
@@ -220,7 +228,6 @@ struct MeetingDetailView: View {
             }
         }
 
-        // Google Meet or any other platform — open in browser
         NSWorkspace.shared.open(webURL)
     }
 }

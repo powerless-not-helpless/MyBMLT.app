@@ -3,11 +3,14 @@ import MapKit
 
 struct ContentView: View {
     @StateObject private var service = BMLTService()
+    @StateObject private var favoritesService = FavoritesService()
+    @StateObject private var searchHistoryService = SearchHistoryService()
     @State private var searchText = ""
     @State private var selectedDay: Int? = nil
     @State private var selectedArea: Int = -1
     @State private var selectedVenue: Int = -1
     @State private var selectedMeeting: Meeting? = nil
+    @State private var isSearchFocused = false
 
     var filteredMeetings: [Meeting] {
         service.meetings
@@ -29,102 +32,172 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationSplitView {
-            VStack(spacing: 0) {
+        TabView {
+            // Meetings Tab
+            NavigationSplitView {
+                VStack(spacing: 0) {
 
-                // Area + Venue filter dropdowns
-                HStack {
-                    Picker("Area", selection: $selectedArea) {
-                        Text("All Areas").tag(-1)
-                        ForEach(ServiceArea.all) { area in
-                            Text(area.shortName).tag(area.id)
-                        }
-                    }
-                    .pickerStyle(.menu)
-
-                    Spacer()
-
-                    Picker("Venue", selection: $selectedVenue) {
-                        Text("All").tag(-1)
-                        Text("In-Person").tag(1)
-                        Text("Virtual").tag(2)
-                        Text("Hybrid").tag(3)
-                    }
-                    .pickerStyle(.menu)
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, 4)
-
-                // Day filter chips
-                ScrollView(.horizontal, showsIndicators: false) {
+                    // Area + Venue filter dropdowns
                     HStack {
-                        DayChip(label: "All", tag: nil, selected: selectedDay)
-                            .onTapGesture { selectedDay = nil }
-                        ForEach(1...7, id: \.self) { day in
-                            DayChip(label: dayName(day), tag: day, selected: selectedDay)
-                                .onTapGesture { selectedDay = day }
+                        Picker("Area", selection: $selectedArea) {
+                            Text("All Areas").tag(-1)
+                            ForEach(ServiceArea.all) { area in
+                                Text(area.shortName).tag(area.id)
+                            }
                         }
+                        .pickerStyle(.menu)
+
+                        Spacer()
+
+                        Picker("Venue", selection: $selectedVenue) {
+                            Text("All").tag(-1)
+                            Text("In-Person").tag(1)
+                            Text("Virtual").tag(2)
+                            Text("Hybrid").tag(3)
+                        }
+                        .pickerStyle(.menu)
                     }
                     .padding(.horizontal)
-                    .padding(.vertical, 8)
-                }
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
 
-                Divider()
-
-                if service.isLoading && service.meetings.isEmpty {
-                    ProgressView("Loading meetings...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let error = service.error, service.meetings.isEmpty {
-                    VStack {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                        Text(error)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        Button("Retry") {
-                            Task { await service.refresh() }
+                    // Day filter chips
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            DayChip(label: "All", tag: nil, selected: selectedDay)
+                                .onTapGesture { selectedDay = nil }
+                            ForEach(1...7, id: \.self) { day in
+                                DayChip(label: dayName(day), tag: day, selected: selectedDay)
+                                    .onTapGesture { selectedDay = day }
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List(filteredMeetings, selection: $selectedMeeting) { meeting in
-                        MeetingRow(meeting: meeting)
-                            .tag(meeting)
-                    }
-                    .listStyle(.plain)
-                }
 
-                if let lastUpdated = service.lastUpdated {
-                    HStack {
-                        Text("Found \(filteredMeetings.count) Meetings as of \(lastUpdated.formatted(date: .omitted, time: .shortened))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        if service.isLoading {
-                            ProgressView().scaleEffect(0.6)
-                        } else {
-                            Button("Refresh") {
+                    // Search history dropdown
+                    if isSearchFocused && !searchHistoryService.history.isEmpty && searchText.isEmpty {
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack {
+                                Text("Recent Searches")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Button("Clear") {
+                                    searchHistoryService.clear()
+                                }
+                                .font(.caption)
+                                .foregroundStyle(.blue)
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 6)
+
+                            ForEach(searchHistoryService.history, id: \.self) { item in
+                                Button {
+                                    searchText = item
+                                    isSearchFocused = false
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "clock")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        Text(item)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.primary)
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            Divider()
+                        }
+                        .background(.regularMaterial)
+                    }
+
+                    Divider()
+
+                    if service.isLoading && service.meetings.isEmpty {
+                        ProgressView("Loading meetings...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if let error = service.error, service.meetings.isEmpty {
+                        VStack {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.largeTitle)
+                            Text(error)
+                                .multilineTextAlignment(.center)
+                                .padding()
+                            Button("Retry") {
                                 Task { await service.refresh() }
                             }
-                            .font(.caption)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        List(filteredMeetings, selection: $selectedMeeting) { meeting in
+                            HStack {
+                                MeetingRow(meeting: meeting)
+                                Spacer()
+                                Button {
+                                    favoritesService.toggle(meeting)
+                                } label: {
+                                    Image(systemName: favoritesService.isFavorite(meeting) ? "star.fill" : "star")
+                                        .foregroundStyle(favoritesService.isFavorite(meeting) ? .yellow : .secondary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .tag(meeting)
+                        }
+                        .listStyle(.plain)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 6)
-                    .background(.bar)
+
+                    if let lastUpdated = service.lastUpdated {
+                        HStack {
+                            Text("Updated \(lastUpdated.formatted(date: .abbreviated, time: .shortened))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            if service.isLoading {
+                                ProgressView().scaleEffect(0.6)
+                            } else {
+                                Button("Refresh") {
+                                    Task { await service.refresh() }
+                                }
+                                .font(.caption)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 6)
+                        .background(.bar)
+                    }
+                }
+                .searchable(text: $searchText, prompt: "Search meetings...")
+                .onSubmit(of: .search) {
+                    if !searchText.isEmpty {
+                        searchHistoryService.add(searchText)
+                    }
+                }
+                .navigationTitle("Meetings (\(filteredMeetings.count))")
+                .task { await service.loadMeetings() }
+
+            } detail: {
+                if let meeting = selectedMeeting {
+                    MeetingDetailView(meeting: meeting)
+                        .environmentObject(favoritesService)
+                } else {
+                    SummaryView(meetings: service.meetings, lastUpdated: service.lastUpdated, selectedArea: selectedArea)
                 }
             }
-            .searchable(text: $searchText, prompt: "Search meetings...")
-            .navigationTitle("Meetings (\(filteredMeetings.count))")
-            .task { await service.loadMeetings() }
-
-        } detail: {
-            if let meeting = selectedMeeting {
-                MeetingDetailView(meeting: meeting)
-            } else {
-                SummaryView(meetings: service.meetings, lastUpdated: service.lastUpdated, selectedArea: selectedArea)
+            .tabItem {
+                Label("Meetings", systemImage: "list.bullet")
             }
+
+            // Favorites Tab
+            FavoritesView(meetings: service.meetings)
+                .environmentObject(favoritesService)
+                .tabItem {
+                    Label("Favorites", systemImage: "star.fill")
+                }
         }
     }
 
