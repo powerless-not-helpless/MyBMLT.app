@@ -123,8 +123,7 @@ struct ContentView: View {
             if let meeting = selectedMeeting {
                 MeetingDetailView(meeting: meeting)
             } else {
-                Text("Select a meeting")
-                    .foregroundStyle(.secondary)
+                SummaryView(meetings: service.meetings, lastUpdated: service.lastUpdated, selectedArea: selectedArea)
             }
         }
     }
