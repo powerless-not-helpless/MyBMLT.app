@@ -128,7 +128,7 @@ struct MeetingDetailView: View {
 
                         if let link = meeting.virtualLink, !link.isEmpty {
                             Button {
-                                openZoom(link: link)
+                                openMeetingLink(link: link)
                             } label: {
                                 Label("Join Meeting", systemImage: "video.fill")
                                     .font(.subheadline)
@@ -196,26 +196,32 @@ struct MeetingDetailView: View {
         }
     }
 
-    private func openZoom(link: String) {
+    private func openMeetingLink(link: String) {
         let cleaned = link.replacingOccurrences(of: " ", with: "")
         guard let webURL = URL(string: cleaned) else { return }
+        let host = webURL.host ?? ""
 
-        let path = webURL.path
-        let meetingId = path.components(separatedBy: "/").last ?? ""
-        let queryItems = URLComponents(url: webURL, resolvingAgainstBaseURL: false)?
-            .queryItems ?? []
-        let pwd = queryItems.first(where: { $0.name == "pwd" })?.value
+        if host.contains("zoom.us") {
+            // Zoom — try deep link first, fall back to browser
+            let path = webURL.path
+            let meetingId = path.components(separatedBy: "/").last ?? ""
+            let queryItems = URLComponents(url: webURL, resolvingAgainstBaseURL: false)?
+                .queryItems ?? []
+            let pwd = queryItems.first(where: { $0.name == "pwd" })?.value
 
-        var zoomString = "zoommtg://zoom.us/join?confno=\(meetingId)"
-        if let pwd = pwd {
-            zoomString += "&pwd=\(pwd)"
+            var zoomString = "zoommtg://zoom.us/join?confno=\(meetingId)"
+            if let pwd = pwd {
+                zoomString += "&pwd=\(pwd)"
+            }
+
+            if let zoomURL = URL(string: zoomString),
+               NSWorkspace.shared.open(zoomURL) {
+                return
+            }
         }
 
-        if let zoomURL = URL(string: zoomString),
-           NSWorkspace.shared.open(zoomURL) {
-        } else {
-            NSWorkspace.shared.open(webURL)
-        }
+        // Google Meet or any other platform — open in browser
+        NSWorkspace.shared.open(webURL)
     }
 }
 
