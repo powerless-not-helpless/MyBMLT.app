@@ -5,9 +5,11 @@ struct ContentView: View {
     @StateObject private var service = BMLTService()
     @StateObject private var favoritesService = FavoritesService()
     @StateObject private var searchHistoryService = SearchHistoryService()
+    @StateObject private var newMeetingsService = NewMeetingsService()
+    @StateObject private var visitListService = VisitListService()
     @State private var searchText = ""
     @State private var selectedDay: Int? = nil
-    @State private var selectedArea: Int = -1
+    @State private var selectedArea: Int = 1157
     @State private var selectedVenue: Int = -1
     @State private var selectedMeeting: Meeting? = nil
     @State private var isSearchFocused = false
@@ -139,6 +141,13 @@ struct ContentView: View {
                                 MeetingRow(meeting: meeting)
                                 Spacer()
                                 Button {
+                                    visitListService.toggle(meeting)
+                                } label: {
+                                    Image(systemName: visitListService.isTarget(meeting) ? "mappin.circle.fill" : "mappin.circle")
+                                        .foregroundStyle(visitListService.isTarget(meeting) ? .red : .secondary)
+                                }
+                                .buttonStyle(.plain)
+                                Button {
                                     favoritesService.toggle(meeting)
                                 } label: {
                                     Image(systemName: favoritesService.isFavorite(meeting) ? "star.fill" : "star")
@@ -198,6 +207,20 @@ struct ContentView: View {
                 .tabItem {
                     Label("Favorites", systemImage: "star.fill")
                 }
+
+            // New Meetings Tab
+            NewMeetingsView(meetings: service.meetings)
+                .environmentObject(newMeetingsService)
+                .tabItem {
+                    Label("New", systemImage: "sparkles")
+                }
+
+            // Visit List Tab
+            VisitListView(meetings: service.meetings)
+                .environmentObject(visitListService)
+                .tabItem {
+                    Label("Visit List", systemImage: "mappin.and.ellipse")
+                }
         }
     }
 
@@ -248,15 +271,14 @@ struct MeetingRow: View {
                 .foregroundStyle(venueBadgeColor(meeting.venueType))
                 .clipShape(Capsule())
 
-            if meeting.venueType != 2 && !meeting.locationName.isEmpty {
+            if !meeting.locationName.isEmpty {
                 Text(meeting.locationName)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
-            if meeting.venueType != 2 {
-                if !meeting.street.isEmpty || !meeting.city.isEmpty || !meeting.zip.isEmpty {
-                    HStack {
+            if !meeting.street.isEmpty || !meeting.city.isEmpty || !meeting.zip.isEmpty {
+                HStack {
                         Text([meeting.street, meeting.city, meeting.zip]
                             .filter { !$0.isEmpty }
                             .joined(separator: ", "))
@@ -276,7 +298,6 @@ struct MeetingRow: View {
                             .buttonStyle(.plain)
                         }
                     }
-                }
             }
 
             if meeting.venueType == 2 || meeting.venueType == 3 {
