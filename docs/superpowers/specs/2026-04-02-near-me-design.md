@@ -61,6 +61,7 @@ struct MeetingWithDistance: Identifiable {
 - Pure display layer — observes `NearMeViewModel`
 - `onAppear` calls `LocationService.requestLocation()`
 - Renders one of four states (see UI States below)
+- When meetings are found: shows mini-map above the card list (see Mini-Map below)
 
 ---
 
@@ -117,6 +118,39 @@ Sort by `rawDelta` ascending. Take first 3.
 - **Address** — tertiary, gray
 - **Virtual link** — shown in place of distance/address for virtual meetings
 
+## Mini-Map
+
+Shown above the meeting cards when `nearMeetings` is non-empty. Read-only — no tap interaction on pins.
+
+- Fixed height (~180pt), full width, rounded corners
+- SwiftUI `Map` view with:
+  - **User location dot** — via `showsUserLocation: true` (no custom annotation needed)
+  - **Meeting pins** — one `MapAnnotation` per in-person or hybrid meeting with coordinates; virtual-only meetings are excluded
+  - **Region** — auto-fit to bounding box of all visible pins + user location, with ~20% padding
+- Region is recomputed whenever `nearMeetings` or `currentLocation` changes
+- No tap handling on pins in v1 — pins are display-only
+
+```swift
+// Region fitting helper (in NearMeViewModel or a free function)
+func fitRegion(meetings: [MeetingWithDistance], userLocation: CLLocation) -> MKCoordinateRegion {
+    let coords = meetings.compactMap { m -> CLLocationCoordinate2D? in
+        guard let lat = m.meeting.latitude, let lon = m.meeting.longitude else { return nil }
+        return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+    } + [userLocation.coordinate]
+
+    let minLat = coords.map(\.latitude).min()!
+    let maxLat = coords.map(\.latitude).max()!
+    let minLon = coords.map(\.longitude).min()!
+    let maxLon = coords.map(\.longitude).max()!
+
+    let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2,
+                                        longitude: (minLon + maxLon) / 2)
+    let span = MKCoordinateSpan(latitudeDelta: (maxLat - minLat) * 1.4,
+                                longitudeDelta: (maxLon - minLon) * 1.4)
+    return MKCoordinateRegion(center: center, span: span)
+}
+```
+
 ## Footer
 - Left: "Updated just now · [City, State]" (from reverse geocode or last known location label)
 - Right: "Refresh" button → triggers new one-shot location request
@@ -136,5 +170,4 @@ Sort by `rawDelta` ascending. Take first 3.
 
 - Saved/home location fallback
 - Radius filter or distance cutoff
-- Map view of nearby meetings
 - Cancellation/schedule exception data
