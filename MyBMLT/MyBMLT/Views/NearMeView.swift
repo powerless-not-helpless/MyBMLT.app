@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import MapKit
 import CoreLocation
 
@@ -96,23 +97,26 @@ struct NearMeView: View {
         ScrollView {
             VStack(spacing: 0) {
                 // Mini-map
-                Map(coordinateRegion: $viewModel.mapRegion, showsUserLocation: true, annotationItems: mapAnnotationItems) { item in
-                    MapAnnotation(coordinate: item.coordinate) {
-                        VStack(spacing: 2) {
-                            Text(item.name)
-                                .font(.caption2)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(item.color)
-                                .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                            Image(systemName: "arrowtriangle.down.fill")
-                                .font(.system(size: 6))
-                                .foregroundStyle(item.color)
-                                .offset(y: -3)
+                Map(position: $viewModel.cameraPosition) {
+                    ForEach(mapAnnotationItems) { item in
+                        Annotation(item.name, coordinate: item.coordinate) {
+                            VStack(spacing: 2) {
+                                Text(item.name)
+                                    .font(.caption2)
+                                    .fontWeight(.semibold)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
+                                    .background(item.color)
+                                    .foregroundStyle(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                Image(systemName: "arrowtriangle.down.fill")
+                                    .font(.system(size: 6))
+                                    .foregroundStyle(item.color)
+                                    .offset(y: -3)
+                            }
                         }
                     }
+                    UserAnnotation()
                 }
                 .frame(height: 180)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
