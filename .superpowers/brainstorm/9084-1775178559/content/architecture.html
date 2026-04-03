@@ -1,0 +1,61 @@
+<h2>Near Me — Architecture</h2>
+<p class="subtitle">Section 1 of 4: Components and data flow</p>
+
+<div style="font-family: monospace; background: #1a1a2e; color: #e0e0e0; border-radius: 12px; padding: 24px; line-height: 1.8; font-size: 13px;">
+
+<div style="color: #888; margin-bottom: 16px;">── New files ──────────────────────────────────────────</div>
+
+<div style="margin-bottom: 20px;">
+  <span style="color: #7ec8e3;">Services/LocationService.swift</span>
+  <div style="color: #aaa; margin-left: 20px;">ObservableObject · owns CLLocationManager</div>
+  <div style="color: #aaa; margin-left: 20px;">@Published currentLocation: CLLocation?</div>
+  <div style="color: #aaa; margin-left: 20px;">@Published authStatus: CLAuthorizationStatus</div>
+  <div style="color: #aaa; margin-left: 20px;">macOS: requestLocation() one-shot</div>
+  <div style="color: #aaa; margin-left: 20px;">iOS:  startUpdatingLocation() low-accuracy continuous</div>
+</div>
+
+<div style="margin-bottom: 20px;">
+  <span style="color: #7ec8e3;">Models/MeetingWithDistance.swift</span>
+  <div style="color: #aaa; margin-left: 20px;">struct wrapping Meeting + distance: Double? (miles) + minutesUntil: Int</div>
+</div>
+
+<div style="margin-bottom: 20px;">
+  <span style="color: #7ec8e3;">ViewModels/NearMeViewModel.swift</span>
+  <div style="color: #aaa; margin-left: 20px;">ObservableObject</div>
+  <div style="color: #aaa; margin-left: 20px;">@Published nearMeetings: [MeetingWithDistance]  ← max 3</div>
+  <div style="color: #aaa; margin-left: 20px;">Subscribes to LocationService.currentLocation via Combine</div>
+  <div style="color: #aaa; margin-left: 20px;">Reads BMLTService.meetings (passed in on init)</div>
+  <div style="color: #aaa; margin-left: 20px;">macOS: Timer fires every 60s → recompute</div>
+  <div style="color: #aaa; margin-left: 20px;">iOS:  location update → recompute</div>
+  <div style="color: #aaa; margin-left: 20px;">Filter: next 3 hours · sort by start time · in-person+hybrid get distance</div>
+</div>
+
+<div style="margin-bottom: 20px;">
+  <span style="color: #7ec8e3;">Views/NearMeView.swift</span>
+  <div style="color: #aaa; margin-left: 20px;">Observes NearMeViewModel</div>
+  <div style="color: #aaa; margin-left: 20px;">onAppear → LocationService.requestLocation()</div>
+  <div style="color: #aaa; margin-left: 20px;">Shows 3 meeting cards with time + distance + venue badge</div>
+  <div style="color: #aaa; margin-left: 20px;">Empty/permission-denied/loading states</div>
+</div>
+
+<div style="color: #888; margin-bottom: 16px;">── Modified files ─────────────────────────────────────</div>
+
+<div style="margin-bottom: 12px;">
+  <span style="color: #f4c430;">ContentView.swift</span>
+  <div style="color: #aaa; margin-left: 20px;">Add NearMe tab · pass LocationService as @EnvironmentObject</div>
+</div>
+
+<div style="margin-bottom: 12px;">
+  <span style="color: #f4c430;">MyBMLTApp.swift</span>
+  <div style="color: #aaa; margin-left: 20px;">@StateObject var locationService = LocationService()</div>
+  <div style="color: #aaa; margin-left: 20px;">Inject into environment</div>
+</div>
+
+<div style="color: #888; margin-top: 24px; margin-bottom: 8px;">── Data flow ──────────────────────────────────────────</div>
+<div style="color: #ccc;">
+  BMLTService.meetings ──┐<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──▶ NearMeViewModel ──▶ NearMeView<br>
+  LocationService.loc ───┘
+</div>
+
+</div>
