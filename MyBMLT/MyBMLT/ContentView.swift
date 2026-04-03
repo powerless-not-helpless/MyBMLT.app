@@ -7,6 +7,7 @@ struct ContentView: View {
     @StateObject private var searchHistoryService = SearchHistoryService()
     @StateObject private var newMeetingsService = NewMeetingsService()
     @StateObject private var visitListService = VisitListService()
+    @EnvironmentObject private var locationService: LocationService
     @State private var searchText = ""
     @State private var selectedDay: Int? = nil
     @State private var selectedArea: Int = 1157
@@ -206,6 +207,13 @@ struct ContentView: View {
                 .environmentObject(favoritesService)
                 .tabItem {
                     Label("Favorites", systemImage: "star.fill")
+                }
+
+            // Near Me Tab
+            NearMeView(meetings: service.meetings)
+                .environmentObject(locationService)
+                .tabItem {
+                    Label("Near Me", systemImage: "location.circle")
                 }
 
             // New Meetings Tab
