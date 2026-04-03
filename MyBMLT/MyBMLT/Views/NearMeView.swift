@@ -215,11 +215,24 @@ struct NearMeetingCard: View {
 
             if item.meeting.venueType != 2,
                !item.meeting.street.isEmpty || !item.meeting.city.isEmpty {
-                Text([item.meeting.street, item.meeting.city]
-                    .filter { !$0.isEmpty }
-                    .joined(separator: ", "))
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                HStack {
+                    Text([item.meeting.street, item.meeting.city]
+                        .filter { !$0.isEmpty }
+                        .joined(separator: ", "))
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                    Spacer()
+                    if let lat = item.meeting.latitude, let lon = item.meeting.longitude {
+                        Button {
+                            openInMaps(lat: lat, lon: lon, name: item.meeting.name)
+                        } label: {
+                            Image(systemName: "map")
+                                .font(.caption)
+                                .foregroundStyle(.blue)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
             }
         }
         .padding()
@@ -243,6 +256,17 @@ struct NearMeetingCard: View {
         case 3: return .orange
         default: return .secondary
         }
+    }
+
+    private func openInMaps(lat: Double, lon: Double, name: String) {
+        let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "maps://?q=\(encoded)&ll=\(lat),\(lon)"
+        guard let url = URL(string: urlString) else { return }
+        #if os(macOS)
+        NSWorkspace.shared.open(url)
+        #else
+        UIApplication.shared.open(url)
+        #endif
     }
 }
 
