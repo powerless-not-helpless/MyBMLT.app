@@ -93,6 +93,103 @@ struct NearMeView: View {
     }
 
     private var meetingsView: some View {
-        Text("Meetings found — cards coming in next task")
+        ScrollView {
+            VStack(spacing: 10) {
+                ForEach(viewModel.nearMeetings) { item in
+                    NearMeetingCard(item: item)
+                }
+            }
+            .padding()
+
+            HStack {
+                Text("Updated just now")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("Refresh") {
+                    locationService.requestLocation()
+                }
+                .font(.caption)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+        }
+    }
+}
+
+struct NearMeetingCard: View {
+    let item: MeetingWithDistance
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Text(item.meeting.name)
+                    .font(.headline)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(item.timeLabel)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(timeLabelColor)
+                    Text(item.meeting.formattedTime)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            HStack(spacing: 6) {
+                Text(item.meeting.venueLabel)
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(venueBadgeColor(item.meeting.venueType).opacity(0.2))
+                    .foregroundStyle(venueBadgeColor(item.meeting.venueType))
+                    .clipShape(Capsule())
+
+                if let dist = item.distanceLabel {
+                    Text("\(dist) · \(item.meeting.locationName)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else if item.meeting.venueType == 2,
+                          let link = item.meeting.virtualLink, !link.isEmpty {
+                    Text(link)
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            }
+
+            if item.meeting.venueType != 2,
+               !item.meeting.street.isEmpty || !item.meeting.city.isEmpty {
+                Text([item.meeting.street, item.meeting.city]
+                    .filter { !$0.isEmpty }
+                    .joined(separator: ", "))
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(item.minutesUntil <= 0 ? Color.orange.opacity(0.4) : Color.clear, lineWidth: 2)
+        )
+    }
+
+    private var timeLabelColor: Color {
+        if item.minutesUntil <= 0 { return .orange }
+        if item.minutesUntil <= 30 { return .blue }
+        return .secondary
+    }
+
+    private func venueBadgeColor(_ type: Int) -> Color {
+        switch type {
+        case 1: return .green
+        case 2: return .blue
+        case 3: return .orange
+        default: return .secondary
+        }
     }
 }
