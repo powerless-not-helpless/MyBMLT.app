@@ -203,13 +203,19 @@ struct NearMeetingCard: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-                } else if item.meeting.venueType == 2,
-                          let link = item.meeting.virtualLink, !link.isEmpty {
-                    Text(link)
-                        .font(.caption)
-                        .foregroundStyle(.blue)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+                }
+            }
+
+            if (item.meeting.venueType == 2 || item.meeting.venueType == 3),
+               let rawLink = item.meeting.virtualLink, !rawLink.isEmpty,
+               let url = URL(string: rawLink.trimmingCharacters(in: .whitespaces)) {
+                Link(destination: url) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "video.fill")
+                            .font(.caption)
+                        Text("Join Meeting")
+                            .font(.caption)
+                    }
                 }
             }
 
