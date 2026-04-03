@@ -7,6 +7,7 @@ struct NearMeView: View {
     let meetings: [Meeting]
     @EnvironmentObject var locationService: LocationService
     @StateObject private var viewModel = NearMeViewModel()
+    @State private var cameraPosition: MapCameraPosition = .automatic
 
     var body: some View {
         NavigationSplitView {
@@ -37,6 +38,9 @@ struct NearMeView: View {
             }
             .onReceive(Timer.publish(every: 60, on: .main, in: .common).autoconnect()) { _ in
                 viewModel.recompute(meetings: meetings, location: locationService.currentLocation)
+            }
+            .onReceive(viewModel.$mapRegion) { region in
+                cameraPosition = .region(region)
             }
         } detail: {
             Text("Select a meeting")
@@ -97,7 +101,7 @@ struct NearMeView: View {
         ScrollView {
             VStack(spacing: 0) {
                 // Mini-map
-                Map(position: $viewModel.cameraPosition) {
+                Map(position: $cameraPosition) {
                     ForEach(mapAnnotationItems) { item in
                         Annotation(item.name, coordinate: item.coordinate) {
                             VStack(spacing: 2) {
