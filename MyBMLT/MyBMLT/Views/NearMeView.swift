@@ -6,8 +6,10 @@ import CoreLocation
 struct NearMeView: View {
     let meetings: [Meeting]
     @EnvironmentObject var locationService: LocationService
+    @EnvironmentObject var favoritesService: FavoritesService
     @StateObject private var viewModel = NearMeViewModel()
     @State private var cameraPosition: MapCameraPosition = .automatic
+    @State private var selectedMeeting: Meeting? = nil
 
     var body: some View {
         NavigationSplitView {
@@ -43,8 +45,13 @@ struct NearMeView: View {
                 cameraPosition = .region(region)
             }
         } detail: {
-            Text("Select a meeting")
-                .foregroundStyle(.secondary)
+            if let meeting = selectedMeeting {
+                MeetingDetailView(meeting: meeting)
+                    .environmentObject(favoritesService)
+            } else {
+                Text("Select a meeting")
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
@@ -131,6 +138,7 @@ struct NearMeView: View {
                 VStack(spacing: 10) {
                     ForEach(viewModel.nearMeetings) { item in
                         NearMeetingCard(item: item)
+                            .onTapGesture { selectedMeeting = item.meeting }
                     }
                 }
                 .padding(.horizontal)

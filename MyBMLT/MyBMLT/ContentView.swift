@@ -212,6 +212,7 @@ struct ContentView: View {
             // Near Me Tab
             NearMeView(meetings: service.meetings)
                 .environmentObject(locationService)
+                .environmentObject(favoritesService)
                 .tabItem {
                     Label("Near Me", systemImage: "location.circle")
                 }
@@ -219,6 +220,7 @@ struct ContentView: View {
             // New Meetings Tab
             NewMeetingsView(meetings: service.meetings)
                 .environmentObject(newMeetingsService)
+                .environmentObject(favoritesService)
                 .tabItem {
                     Label("New", systemImage: "sparkles")
                 }
