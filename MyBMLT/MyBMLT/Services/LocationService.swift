@@ -56,8 +56,10 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authStatus = manager.authorizationStatus
-        if manager.authorizationStatus == .authorizedWhenInUse ||
-           manager.authorizationStatus == .authorizedAlways {
+        switch manager.authorizationStatus {
+        case .denied, .restricted, .notDetermined:
+            break
+        default:
             fetchLocation()
         }
     }
