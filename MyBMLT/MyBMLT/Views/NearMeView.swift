@@ -94,25 +94,69 @@ struct NearMeView: View {
 
     private var meetingsView: some View {
         ScrollView {
-            VStack(spacing: 10) {
-                ForEach(viewModel.nearMeetings) { item in
-                    NearMeetingCard(item: item)
+            VStack(spacing: 0) {
+                // Mini-map
+                Map(coordinateRegion: $viewModel.mapRegion, showsUserLocation: true, annotationItems: mapAnnotationItems) { item in
+                    MapAnnotation(coordinate: item.coordinate) {
+                        VStack(spacing: 2) {
+                            Text(item.name)
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(item.color)
+                                .foregroundStyle(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            Image(systemName: "arrowtriangle.down.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(item.color)
+                                .offset(y: -3)
+                        }
+                    }
                 }
-            }
-            .padding()
+                .frame(height: 180)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .padding([.horizontal, .top])
+                .padding(.bottom, 4)
 
-            HStack {
-                Text("Updated just now")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Button("Refresh") {
-                    locationService.requestLocation()
+                // Cards
+                VStack(spacing: 10) {
+                    ForEach(viewModel.nearMeetings) { item in
+                        NearMeetingCard(item: item)
+                    }
                 }
-                .font(.caption)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+
+                // Footer
+                HStack {
+                    Text("Updated just now")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Refresh") {
+                        locationService.requestLocation()
+                    }
+                    .font(.caption)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 12)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
+        }
+    }
+
+    // Only in-person and hybrid meetings with coordinates appear on the map
+    private var mapAnnotationItems: [NearMeAnnotation] {
+        viewModel.nearMeetings.compactMap { item in
+            guard item.meeting.venueType != 2,
+                  let lat = item.meeting.latitude,
+                  let lon = item.meeting.longitude else { return nil }
+            return NearMeAnnotation(
+                id: item.meeting.id,
+                coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+                name: item.meeting.name,
+                color: item.meeting.venueType == 3 ? .orange : .green
+            )
         }
     }
 }
@@ -192,4 +236,11 @@ struct NearMeetingCard: View {
         default: return .secondary
         }
     }
+}
+
+struct NearMeAnnotation: Identifiable {
+    let id: Int
+    let coordinate: CLLocationCoordinate2D
+    let name: String
+    let color: Color
 }
