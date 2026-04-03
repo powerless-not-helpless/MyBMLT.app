@@ -226,6 +226,7 @@ struct ContentView: View {
             // Visit List Tab
             VisitListView(meetings: service.meetings)
                 .environmentObject(visitListService)
+                .environmentObject(favoritesService)
                 .tabItem {
                     Label("Visit List", systemImage: "mappin.and.ellipse")
                 }
