@@ -349,9 +349,12 @@ struct MeetingRow: View {
     private func openInMaps(lat: Double, lon: Double, name: String) {
         let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "maps://?q=\(encoded)&ll=\(lat),\(lon)"
-        if let url = URL(string: urlString) {
-            NSWorkspace.shared.open(url)
-        }
+        guard let url = URL(string: urlString) else { return }
+        #if os(macOS)
+        NSWorkspace.shared.open(url)
+        #else
+        UIApplication.shared.open(url)
+        #endif
     }
 }
 
