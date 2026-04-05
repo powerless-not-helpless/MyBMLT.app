@@ -20,7 +20,10 @@ struct ContentView: View {
             .filter { meeting in
                 let matchesDay    = selectedDay   == nil || meeting.weekday        == selectedDay
                 let matchesArea   = selectedArea  == -1  || meeting.serviceBodyId  == selectedArea
-                let matchesVenue  = selectedVenue == -1  || meeting.venueType      == selectedVenue
+                let matchesVenue  = selectedVenue == -1  ||
+                    (selectedVenue == 4
+                        ? meeting.formats.contains("W")
+                        : meeting.venueType == selectedVenue)
                 let matchesSearch = searchText.isEmpty ||
                     meeting.name.localizedCaseInsensitiveContains(searchText) ||
                     meeting.city.localizedCaseInsensitiveContains(searchText) ||
@@ -57,6 +60,7 @@ struct ContentView: View {
                             Text("In-Person").tag(1)
                             Text("Virtual").tag(2)
                             Text("Hybrid").tag(3)
+                            Text("Women").tag(4)
                         }
                         .pickerStyle(.menu)
                     }

@@ -8,8 +8,8 @@ struct MeetingDetailView: View {
 
     var clipboardText: String {
         var lines: [String] = []
-        lines.append(meeting.weekdayName)
-        lines.append("\(meeting.name) at \(meeting.formattedTime)")
+        lines.append("\(meeting.weekdayName) at \(meeting.formattedTime)")
+        lines.append(meeting.name)
 
         if meeting.venueType != 2 {
             let addressParts = [meeting.street, meeting.city, meeting.zip]
@@ -24,6 +24,9 @@ struct MeetingDetailView: View {
                 let cleanedLink = (link.components(separatedBy: "?pwd=").first ?? link)
                     .replacingOccurrences(of: " ", with: "")
                 lines.append(cleanedLink)
+            }
+            if let password = meeting.passwordValue {
+                lines.append("Password: \(password)")
             }
         }
 
@@ -153,21 +156,20 @@ struct MeetingDetailView: View {
                             .lineLimit(2)
                         }
 
-                        if let info = meeting.virtualInfo,
-                           !info.isEmpty,
-                           !info.lowercased().contains("no password") {
-                            HStack(spacing: 4) {
-                                Image(systemName: "lock.fill")
-                                    .font(.caption)
+                        if let password = meeting.passwordValue {
+                            HStack(spacing: 8) {
+                                Label("Password", systemImage: "lock.fill")
+                                    .font(.subheadline)
                                     .foregroundStyle(.orange)
-                                Text(info)
-                                    .font(.caption)
-                                    .foregroundStyle(.orange)
+                                Text(password)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.primary)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 5)
+                                    .background(Color.orange.opacity(0.12))
+                                    .clipShape(Capsule())
                             }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.orange.opacity(0.1))
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
                     }
                     Divider()

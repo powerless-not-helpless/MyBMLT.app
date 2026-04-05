@@ -37,22 +37,22 @@ class VisitListService: ObservableObject {
                 return $0.startTime < $1.startTime
             }
 
-        var lines: [String] = []
-        var lastDay = -1
+        var blocks: [String] = []
         for m in targets {
-            if m.weekday != lastDay {
-                if !lines.isEmpty { lines.append("") }
-                lines.append(m.weekdayName.uppercased())
-                lastDay = m.weekday
-            }
-            var parts = ["\(m.name) — \(m.formattedTime)"]
+            var entry: [String] = []
+            entry.append("\(m.weekdayName) at \(m.formattedTime)")
+            entry.append(m.name)
             let addr = [m.locationName, m.street, m.city, m.zip]
                 .filter { !$0.isEmpty }.joined(separator: ", ")
-            if !addr.isEmpty { parts.append(addr) }
-            if !m.formats.isEmpty { parts.append("Formats: \(m.formats.joined(separator: ", "))") }
-            lines.append("  " + parts.joined(separator: " | "))
+            if !addr.isEmpty { entry.append(addr) }
+            if let link = m.virtualLink, !link.isEmpty {
+                entry.append(link.replacingOccurrences(of: " ", with: ""))
+            }
+            if let password = m.passwordValue { entry.append("Password: \(password)") }
+            if !m.formats.isEmpty { entry.append("Formats: \(m.formats.joined(separator: ", "))") }
+            blocks.append(entry.joined(separator: "\n"))
         }
-        return lines.joined(separator: "\n")
+        return blocks.joined(separator: "\n\n")
     }
 
     private func save() {

@@ -64,4 +64,19 @@ struct Meeting: Identifiable, Codable, Hashable {
     var areaName: String {
         ServiceArea.all.first(where: { $0.id == serviceBodyId })?.fullName ?? "Unknown"
     }
+
+    /// Returns just the password value, stripping known label prefixes, or nil if none.
+    var passwordValue: String? {
+        guard let raw = virtualInfo else { return nil }
+        let trimmed = raw.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !trimmed.lowercased().contains("no password") else { return nil }
+        let prefixes = ["password:", "clave:", "passcode:", "contraseña:", "pw:", "password ", "clave "]
+        let lower = trimmed.lowercased()
+        for prefix in prefixes {
+            if lower.hasPrefix(prefix) {
+                return String(trimmed.dropFirst(prefix.count)).trimmingCharacters(in: .whitespaces)
+            }
+        }
+        return trimmed
+    }
 }

@@ -57,12 +57,13 @@ Three filter controls sit above the meeting list:
 | South Bay | South Bay Area |
 | UEC | United East County Area |
 
-**Venue** (dropdown) — show only in-person, virtual, or hybrid meetings:
+**Venue** (dropdown) — show only in-person, virtual, hybrid, or women's meetings:
 
 - All
 - In-Person
 - Virtual
 - Hybrid
+- Women
 
 **Day chips** — tap a day to show only meetings on that day: All, Sun, Mon, Tue, Wed, Thu, Fri, Sat
 
