@@ -1,7 +1,0 @@
-{"type":"server-started","port":63429,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:63429","screen_dir":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/content","state_dir":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/state"}
-{"type":"screen-added","file":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/content/architecture.html"}
-{"type":"screen-added","file":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/content/nearme-ui.html"}
-{"type":"screen-added","file":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/content/design-summary.html"}
-{"type":"screen-added","file":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/content/nearme-mockup.html"}
-{"type":"screen-added","file":"/Users/jj/Projects/MyBMLT.app/.superpowers/brainstorm/9084-1775178559/content/nearme-mockup-v2.html"}
-{"type":"server-stopped","reason":"idle timeout"}
