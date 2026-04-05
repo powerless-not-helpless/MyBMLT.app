@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyBMLT User Guide</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --border: #d2d2d7;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --accent: #007aff;
+    --green: #34c759;
+    --orange: #ff9f0a;
+    --red: #ff3b30;
+    --blue: #007aff;
+    --badge-green: #d1f0da;
+    --badge-blue: #d6eaff;
+    --badge-orange: #ffecd1;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  .app-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .app-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(145deg, #007aff, #0055c8);
+    border-radius: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,122,255,0.3);
+  }
+
+  .app-icon svg {
+    width: 44px;
+    height: 44px;
+    fill: white;
+  }
+
+  .app-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .app-header p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-top: 6px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+
+  .toc h2 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .toc ol {
+    padding-left: 20px;
+  }
+
+  .toc li {
+    margin: 6px 0;
+  }
+
+  .toc a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .toc a:hover { text-decoration: underline; }
+
+  /* Sections */
+  section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  section h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tab-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .tab-icon.blue   { background: var(--badge-blue); color: var(--blue); }
+  .tab-icon.green  { background: var(--badge-green); color: var(--green); }
+  .tab-icon.orange { background: var(--badge-orange); color: #c57200; }
+  .tab-icon.gray   { background: #ebebeb; color: #555; }
+  .tab-icon.red    { background: #ffd6d6; color: var(--red); }
+  .tab-icon.purple { background: #ecdeff; color: #7b2fff; }
+
+  section .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 1.0rem;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: var(--text);
+  }
+
+  p { margin-bottom: 12px; }
+
+  ul, ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+
+  li { margin: 5px 0; }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    vertical-align: middle;
+  }
+
+  .badge.green  { background: var(--badge-green); color: #1a7a35; }
+  .badge.blue   { background: var(--badge-blue); color: #004fb3; }
+  .badge.orange { background: var(--badge-orange); color: #8a5000; }
+
+  /* Chips row */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 14px;
+  }
+
+  .chip {
+    background: #ebebeb;
+    color: var(--text);
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .chip.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* Step list */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+  }
+
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin: 10px 0;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    min-width: 24px;
+    height: 24px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Color legend */
+  .color-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .color-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+
+  .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .color-item p {
+    margin: 0;
+    font-size: 0.88rem;
+  }
+
+  .color-item strong {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* Info box */
+  .info-box {
+    background: var(--badge-blue);
+    border-left: 3px solid var(--blue);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+
+  .tip-box {
+    background: #f0fdf4;
+    border-left: 3px solid var(--green);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+
+  .warn-box {
+    background: #fffbf0;
+    border-left: 3px solid var(--orange);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+
+  /* Icon inline */
+  .icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  /* Service areas table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 12px 0;
+  }
+
+  th {
+    text-align: left;
+    font-weight: 600;
+    padding: 8px 12px;
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+  }
+
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  /* Troubleshooting */
+  .trouble-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .trouble-q {
+    background: var(--bg);
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .trouble-a {
+    padding: 12px 16px;
+    font-size: 0.92rem;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 48px;
+  }
+
+  @media (max-width: 600px) {
+    section { padding: 20px 18px; }
+    .app-header h1 { font-size: 1.7rem; }
+    .color-legend { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+      </svg>
+    </div>
+    <h1>MyBMLT</h1>
+    <p>User Guide &mdash; San Diego Area Meeting Finder</p>
+  </header>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#meetings">Meetings Tab &mdash; Browse &amp; Filter</a></li>
+      <li><a href="#detail">Meeting Detail</a></li>
+      <li><a href="#nearme">Near Me Tab &mdash; Find Upcoming Meetings</a></li>
+      <li><a href="#favorites">Favorites Tab</a></li>
+      <li><a href="#new">New Meetings Tab</a></li>
+      <li><a href="#visitlist">Visit List Tab</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. Overview -->
+  <section id="overview">
+    <h2>
+      <span class="tab-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+      </span>
+      Overview
+    </h2>
+    <p class="subtitle">What MyBMLT is and how it works</p>
+    <p>
+      <strong>MyBMLT</strong> is a meeting finder for the San Diego area, powered by the
+      <a href="https://bmlt.app" style="color:var(--accent)">BMLT (Basic Meeting List Toolkit)</a> regional server.
+      It lets you browse, search, and filter hundreds of in-person, virtual, and hybrid meetings across
+      nine service areas.
+    </p>
+    <p>The app has five tabs:</p>
+    <ul>
+      <li><strong>Meetings</strong> &mdash; full searchable meeting list with filters</li>
+      <li><strong>Near Me</strong> &mdash; the next 3 meetings starting near you in the next 3 hours</li>
+      <li><strong>Favorites</strong> &mdash; meetings you've starred for quick access</li>
+      <li><strong>New</strong> &mdash; recently added meetings on the server</li>
+      <li><strong>Visit List</strong> &mdash; a personal itinerary you can copy and share</li>
+    </ul>
+    <div class="tip-box">
+      Meeting data is fetched live from the BMLT server and cached locally. The app always shows the
+      most recent data it has while it fetches a fresh copy in the background.
+    </div>
+  </section>
+
+  <!-- 2. Meetings Tab -->
+  <section id="meetings">
+    <h2>
+      <span class="tab-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+      </span>
+      Meetings Tab
+    </h2>
+    <p class="subtitle">Browse, search, and filter all meetings in the San Diego area</p>
+
+    <h3>Filters</h3>
+    <p>Three filter controls sit above the meeting list:</p>
+
+    <p><strong>Area</strong> (dropdown) &mdash; narrow results to one of nine service areas, or leave on <em>All Areas</em>:</p>
+    <table>
+      <thead><tr><th>Short Name</th><th>Full Name</th></tr></thead>
+      <tbody>
+        <tr><td>Beach</td><td>Beach Area</td></tr>
+        <tr><td>Central</td><td>Central Area</td></tr>
+        <tr><td>Hispana</td><td>Habla Hispana Area</td></tr>
+        <tr><td>Imperial Valley</td><td>Imperial Valley Area</td></tr>
+        <tr><td>N. Coastal</td><td>North Coastal Area</td></tr>
+        <tr><td>N. County Inland</td><td>North County Inland Area</td></tr>
+        <tr><td>SEBANA</td><td>South East Barrio Area</td></tr>
+        <tr><td>South Bay</td><td>South Bay Area</td></tr>
+        <tr><td>UEC</td><td>United East County Area</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Venue</strong> (dropdown) &mdash; show only in-person, virtual, or hybrid meetings:</p>
+    <div class="chips">
+      <span class="chip">All</span>
+      <span class="chip" style="background:var(--badge-green);color:#1a7a35">In-Person</span>
+      <span class="chip" style="background:var(--badge-blue);color:#004fb3">Virtual</span>
+      <span class="chip" style="background:var(--badge-orange);color:#8a5000">Hybrid</span>
+    </div>
+
+    <p><strong>Day chips</strong> &mdash; tap a day to show only meetings on that day:</p>
+    <div class="chips">
+      <span class="chip active">All</span>
+      <span class="chip">Sun</span>
+      <span class="chip">Mon</span>
+      <span class="chip">Tue</span>
+      <span class="chip">Wed</span>
+      <span class="chip">Thu</span>
+      <span class="chip">Fri</span>
+      <span class="chip">Sat</span>
+    </div>
+
+    <h3>Search</h3>
+    <p>
+      Use the search bar at the top to find meetings by <strong>name</strong>, <strong>city</strong>,
+      <strong>street</strong>, or <strong>zip code</strong>. Previous searches are saved and shown
+      as suggestions when you tap the search bar while the field is empty. Tap <em>Clear</em> to
+      remove search history.
+    </p>
+
+    <h3>Meeting List</h3>
+    <p>Each row shows the meeting name, day and start time, venue badge, location name, and address.
+      Format tags (e.g. <em>OD</em>, <em>BB</em>) and a wheelchair icon appear at the bottom of each row
+      when applicable.</p>
+
+    <p>Two quick-action icons appear on the right of every row:</p>
+    <ul>
+      <li>
+        <strong>Pin icon</strong> (&#x1F4CC;) &mdash; add or remove the meeting from your
+        <a href="#visitlist">Visit List</a>. Filled red pin = on the list.
+      </li>
+      <li>
+        <strong>Star icon</strong> (&#x2B50;) &mdash; add or remove the meeting from
+        <a href="#favorites">Favorites</a>. Filled yellow star = favorited.
+      </li>
+    </ul>
+
+    <p>For in-person or hybrid meetings, a small <strong>map icon</strong> opens Apple Maps
+      (or the Maps application on macOS) directly to the meeting location.</p>
+
+    <h3>Refresh</h3>
+    <p>
+      A status bar at the bottom of the list shows the last time data was updated and a
+      <strong>Refresh</strong> button. Tap it to force a fresh fetch from the server.
+    </p>
+
+    <h3>Summary View</h3>
+    <p>
+      When no meeting is selected, the right panel (or detail area on iPhone) shows a statistics
+      summary: total meeting count, breakdown by venue type, by day of week, and &mdash; when
+      <em>All Areas</em> is selected &mdash; a per-area breakdown.
+    </p>
+  </section>
+
+  <!-- 3. Meeting Detail -->
+  <section id="detail">
+    <h2>
+      <span class="tab-icon gray">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+      </span>
+      Meeting Detail
+    </h2>
+    <p class="subtitle">All information about a single meeting</p>
+
+    <p>Tap any meeting to open its detail view. It contains:</p>
+    <ul>
+      <li><strong>Name, day, time, and duration</strong></li>
+      <li><strong>Venue badge</strong> &mdash; <span class="badge green">In-Person</span> <span class="badge blue">Virtual</span> <span class="badge orange">Hybrid</span></li>
+      <li><strong>Wheelchair accessible</strong> indicator (blue wheelchair icon), when applicable</li>
+      <li><strong>Service area</strong> name</li>
+      <li><strong>Location section</strong> (in-person and hybrid) &mdash; venue name, full address, and an <em>Open in Maps</em> button</li>
+      <li><strong>Online Meeting section</strong> (virtual and hybrid) &mdash; a <em>Join Meeting</em> button that opens Zoom directly if installed, otherwise opens the link in a browser. Meeting password is displayed with a lock icon if one is required.</li>
+      <li><strong>Meeting Formats</strong> &mdash; all format codes for the meeting (e.g. OD, BB, SP)</li>
+    </ul>
+
+    <p>Two action buttons appear in the top-right corner:</p>
+    <ul>
+      <li><strong>Star button</strong> &mdash; toggle the meeting in/out of Favorites</li>
+      <li><strong>Copy button</strong> &mdash; copies meeting details (name, time, address or link, formats) to the clipboard as plain text. The button briefly shows &ldquo;Copied!&rdquo; as confirmation.</li>
+    </ul>
+
+    <div class="info-box">
+      For Zoom meetings, the app tries to launch the Zoom app directly using a deep link.
+      If Zoom is not installed, it falls back to opening the meeting URL in your default browser.
+    </div>
+  </section>
+
+  <!-- 4. Near Me -->
+  <section id="nearme">
+    <h2>
+      <span class="tab-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+      </span>
+      Near Me Tab
+    </h2>
+    <p class="subtitle">Find the next upcoming meetings closest to your current location</p>
+
+    <h3>How it works</h3>
+    <p>
+      The Near Me tab shows up to <strong>3 meetings</strong> that start within the
+      <strong>next 3 hours</strong>. It includes meetings that started up to
+      <strong>10 minutes ago</strong> (these are marked as &ldquo;In progress&rdquo;).
+    </p>
+    <p>
+      The list updates automatically every 60 seconds. Tap <strong>Refresh</strong> at the
+      bottom to update immediately.
+    </p>
+
+    <h3>Location Permission</h3>
+    <p>
+      The first time you open this tab, the app will request permission to use your location.
+      Grant <em>While Using the App</em> for the best experience. Distance to in-person and
+      hybrid meetings is shown in miles.
+    </p>
+    <p>
+      If location access is denied, tap <strong>Open Settings</strong> to enable it in
+      System Settings &rarr; Privacy &amp; Security &rarr; Location Services.
+    </p>
+
+    <h3>Map</h3>
+    <p>
+      A mini-map at the top shows pins for all nearby in-person and hybrid meetings, plus your
+      current location. The map region automatically fits to include all visible meetings.
+    </p>
+    <ul>
+      <li>Green pins = In-Person meetings</li>
+      <li>Orange pins = Hybrid meetings</li>
+    </ul>
+
+    <h3>Time Urgency Colors</h3>
+    <p>The time label on each card is color-coded:</p>
+    <div class="color-legend">
+      <div class="color-item">
+        <div class="color-dot" style="background: #ff9f0a;"></div>
+        <div>
+          <p><strong>In progress</strong></p>
+          <strong>Started within last 10 min</strong>
+        </div>
+      </div>
+      <div class="color-item">
+        <div class="color-dot" style="background: #007aff;"></div>
+        <div>
+          <p><strong>Starting soon</strong></p>
+          <strong>Within 30 minutes</strong>
+        </div>
+      </div>
+      <div class="color-item">
+        <div class="color-dot" style="background: #888;"></div>
+        <div>
+          <p><strong>Later</strong></p>
+          <strong>More than 30 min away</strong>
+        </div>
+      </div>
+    </div>
+
+    <h3>Actions on each card</h3>
+    <ul>
+      <li><strong>Join Meeting</strong> &mdash; appears for virtual and hybrid meetings; opens Zoom or browser.</li>
+      <li><strong>Map icon</strong> &mdash; appears for in-person and hybrid meetings; opens Apple Maps.</li>
+      <li>Tap anywhere on the card to open the full <a href="#detail">Meeting Detail</a> view.</li>
+    </ul>
+
+    <div class="tip-box">
+      The Near Me tab looks ahead only 3 hours. If no meetings appear, check the
+      <a href="#meetings">Meetings tab</a> to see all upcoming meetings for the week.
+    </div>
+  </section>
+
+  <!-- 5. Favorites -->
+  <section id="favorites">
+    <h2>
+      <span class="tab-icon orange">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </span>
+      Favorites Tab
+    </h2>
+    <p class="subtitle">Your saved meetings for quick access</p>
+
+    <p>
+      Tap the <strong>star icon</strong> on any meeting &mdash; in the list row, or in the detail view &mdash;
+      to add it to Favorites. Tap again to remove it.
+    </p>
+    <p>
+      Favorites are <strong>saved between sessions</strong>. The Favorites tab shows all
+      starred meetings sorted by day of week, then start time. Tapping a meeting opens its
+      <a href="#detail">detail view</a>.
+    </p>
+
+    <div class="info-box">
+      The star icon is yellow when a meeting is favorited and gray when it is not.
+    </div>
+  </section>
+
+  <!-- 6. New Meetings -->
+  <section id="new">
+    <h2>
+      <span class="tab-icon purple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L9.5 8.5H2l6.2 4.5-2.4 7.5L12 16l6.2 4.5-2.4-7.5L22 8.5h-7.5z"/></svg>
+      </span>
+      New Meetings Tab
+    </h2>
+    <p class="subtitle">Stay aware of meetings recently added to the server</p>
+
+    <p>
+      Each time the app loads fresh data, it compares the current meeting list to what it
+      saw on the previous launch. Any meetings that are <strong>new since your last visit</strong>
+      appear in this tab.
+    </p>
+
+    <ol class="steps">
+      <li>Open the <strong>New</strong> tab to see recently added meetings.</li>
+      <li>Tap any meeting to view its details.</li>
+      <li>When you've reviewed everything, tap <strong>Mark All Seen</strong> to clear the list.</li>
+    </ol>
+
+    <div class="tip-box">
+      The tab badge count shows how many unseen new meetings exist. Once you tap
+      <em>Mark All Seen</em>, the count resets to zero.
+    </div>
+  </section>
+
+  <!-- 7. Visit List -->
+  <section id="visitlist">
+    <h2>
+      <span class="tab-icon red">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+      </span>
+      Visit List Tab
+    </h2>
+    <p class="subtitle">Build a personal meeting itinerary and share it</p>
+
+    <p>
+      The Visit List is a curated list of meetings you plan to attend. It's separate from
+      Favorites &mdash; use it to plan a schedule or share a list of recommended meetings.
+    </p>
+
+    <h3>Adding and removing meetings</h3>
+    <ul>
+      <li>Tap the <strong>pin icon</strong> on any meeting row in the Meetings tab to add it to the Visit List. A filled red pin means it's on the list.</li>
+      <li>To remove a meeting while in the Visit List tab, tap the <strong>red pin-slash icon</strong> on the right side of the row.</li>
+    </ul>
+
+    <h3>Viewing your list</h3>
+    <p>
+      Meetings are sorted by day of week, then start time. The footer shows the total count.
+      Tap any meeting to open its <a href="#detail">detail view</a>.
+    </p>
+
+    <h3>Copying your list</h3>
+    <p>
+      Tap <strong>Copy All</strong> in the bottom bar to copy the entire Visit List to the
+      clipboard as formatted plain text, organized by day. You can paste it into a message,
+      note, or email to share with others.
+    </p>
+
+    <p>Example clipboard output:</p>
+    <pre style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:0.82rem;overflow-x:auto;line-height:1.5;">Sunday
+  Serenity Group at 8:00 AM
+  1234 Ocean Blvd, San Diego, 92109
+  Formats: OD, BB
+
+Monday
+  Monday Night Live at 7:30 PM
+  https://zoom.us/j/123456789
+  Formats: SP, D</pre>
+
+    <div class="tip-box">
+      The <em>Copy All</em> button briefly shows &ldquo;Copied!&rdquo; for 2 seconds to confirm.
+    </div>
+  </section>
+
+  <!-- 8. Troubleshooting -->
+  <section id="troubleshooting">
+    <h2>
+      <span class="tab-icon gray">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      </span>
+      Troubleshooting
+    </h2>
+    <p class="subtitle">Common questions and solutions</p>
+
+    <div class="trouble-item">
+      <div class="trouble-q">The meeting list is empty or shows old data</div>
+      <div class="trouble-a">Tap <strong>Refresh</strong> at the bottom of the Meetings tab. If the error icon appears, tap <strong>Retry</strong>. Check your internet connection if the problem persists.</div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q">Near Me shows "No meetings in the next 3 hours"</div>
+      <div class="trouble-a">There are no meetings starting within 3 hours of now in the area. Browse the <strong>Meetings</strong> tab to see all scheduled meetings this week.</div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q">Near Me says location access is needed</div>
+      <div class="trouble-a">Tap <strong>Open Settings</strong> and enable location access for MyBMLT under Privacy &amp; Security &rarr; Location Services. Choose <em>While Using the App</em>.</div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q">Tapping "Join Meeting" opens a browser instead of Zoom</div>
+      <div class="trouble-a">The Zoom app must be installed on your device. If it's not installed, the meeting link opens in your default browser instead, which also works.</div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q">A meeting shows a lock icon with password info</div>
+      <div class="trouble-a">That meeting requires a Zoom password. The password is shown next to the lock icon in the detail view. The <em>Join Meeting</em> button includes the password in the Zoom deep link automatically.</div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q">My favorites or visit list disappeared</div>
+      <div class="trouble-a">Both lists are stored in the app's local cache. They persist across launches but are tied to the app installation. Reinstalling the app will clear them.</div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q">I don't see a meeting I know exists</div>
+      <div class="trouble-a">Check your current filters — day chip, area, and venue type. Tap <strong>All</strong> on the day chips and set the area and venue dropdowns back to <em>All Areas</em> / <em>All</em>. Also try a fresh <strong>Refresh</strong>.</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>MyBMLT &mdash; Data sourced from the BMLT regional server. Meeting information may change; always verify with your local service area.</p>
+  </footer>
+
+</div>
+</body>
+</html>
