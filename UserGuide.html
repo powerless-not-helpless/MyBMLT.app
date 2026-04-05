@@ -391,6 +391,7 @@
       <li><a href="#favorites">Favorites Tab</a></li>
       <li><a href="#new">New Meetings Tab</a></li>
       <li><a href="#visitlist">Visit List Tab</a></li>
+      <li><a href="#reconcile">Reconcile Tab</a></li>
       <li><a href="#troubleshooting">Troubleshooting</a></li>
     </ol>
   </nav>
@@ -410,13 +411,14 @@
       It lets you browse, search, and filter hundreds of in-person, virtual, and hybrid meetings across
       nine service areas.
     </p>
-    <p>The app has five tabs:</p>
+    <p>The app has six tabs:</p>
     <ul>
       <li><strong>Meetings</strong> &mdash; full searchable meeting list with filters</li>
       <li><strong>Near Me</strong> &mdash; the next 3 meetings starting near you in the next 3 hours</li>
       <li><strong>Favorites</strong> &mdash; meetings you've starred for quick access</li>
       <li><strong>New</strong> &mdash; recently added meetings on the server</li>
       <li><strong>Visit List</strong> &mdash; a personal itinerary you can copy and share</li>
+      <li><strong>Reconcile</strong> &mdash; meetings listed in Central and another area</li>
     </ul>
     <div class="tip-box">
       Meeting data is fetched live from the BMLT server and cached locally. The app always shows the
@@ -733,7 +735,39 @@ Monday
     </div>
   </section>
 
-  <!-- 8. Troubleshooting -->
+  <!-- 8. Reconcile -->
+  <section id="reconcile">
+    <h2>
+      <span class="tab-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+      </span>
+      Reconcile Tab
+    </h2>
+    <p class="subtitle">Meetings listed in Central and one or more other areas</p>
+
+    <p>
+      The Reconcile tab shows meetings that appear in both the <strong>Central Area</strong> and
+      at least one other service area under the same name. Each row shows:
+    </p>
+    <ul>
+      <li><strong>Day at time</strong> &mdash; from the Central listing</li>
+      <li><strong>Address</strong> &mdash; street, city, and zip from the Central listing</li>
+      <li><strong>Area badges</strong> &mdash; all areas the meeting is listed in, Central first</li>
+    </ul>
+
+    <h3>Copy All</h3>
+    <p>
+      Tap <strong>Copy All</strong> in the bottom bar to copy every dual listing to the clipboard.
+      Entries where both areas share the same time are combined on one line. If the times differ,
+      each area entry appears on its own line with the meeting name, time, street, and zip.
+    </p>
+
+    <div class="tip-box">
+      Use this tab to identify and clean up duplicate entries on the BMLT regional server.
+    </div>
+  </section>
+
+  <!-- 9. Troubleshooting -->
   <section id="troubleshooting">
     <h2>
       <span class="tab-icon gray">

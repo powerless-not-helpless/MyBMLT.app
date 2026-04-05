@@ -13,7 +13,8 @@
 5. [Favorites Tab](#favorites-tab)
 6. [New Meetings Tab](#new-meetings-tab)
 7. [Visit List Tab](#visit-list-tab)
-8. [Troubleshooting](#troubleshooting)
+8. [Reconcile Tab](#reconcile-tab)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -23,13 +24,14 @@
 
 **MyBMLT** is a meeting finder for the San Diego area, powered by the [BMLT (Basic Meeting List Toolkit)](https://bmlt.app) regional server. It lets you browse, search, and filter hundreds of in-person, virtual, and hybrid meetings across nine service areas.
 
-The app has five tabs:
+The app has six tabs:
 
 - **Meetings** — full searchable meeting list with filters
 - **Near Me** — the next 3 meetings starting near you in the next 3 hours
 - **Favorites** — meetings you've starred for quick access
 - **New** — recently added meetings on the server
 - **Visit List** — a personal itinerary you can copy and share
+- **Reconcile** — meetings listed in Central and another area
 
 > **💡 Tip:** Meeting data is fetched live from the BMLT server and cached locally. The app always shows the most recent data it has while it fetches a fresh copy in the background.
 
@@ -218,6 +220,24 @@ Monday
 ```
 
 > **💡 Tip:** The *Copy All* button briefly shows "Copied!" for 2 seconds to confirm.
+
+---
+
+## Reconcile Tab
+
+**Meetings listed in Central and one or more other areas**
+
+The Reconcile tab shows meetings that appear under the same name in both the **Central Area** and at least one other service area. Each row shows:
+
+- **Day at time** — from the Central listing
+- **Address** — street, city, and zip from the Central listing
+- **Area badges** — all areas the meeting is listed in, Central first
+
+### Copy All
+
+Tap **Copy All** in the bottom bar to copy every dual listing to the clipboard. Entries where both areas share the same time are combined on one line. If the times differ, each area entry appears on its own line with the meeting name, time, street, and zip.
+
+> **💡 Tip:** Use this tab to identify and clean up duplicate entries on the BMLT regional server.
 
 ---
 
