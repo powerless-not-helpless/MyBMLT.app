@@ -123,8 +123,12 @@ struct ReconcileView: View {
                     Spacer()
                     if !dualListings.isEmpty {
                         Button {
+                            #if os(macOS)
                             NSPasteboard.general.clearContents()
                             NSPasteboard.general.setString(copyText, forType: .string)
+                            #else
+                            UIPasteboard.general.string = copyText
+                            #endif
                             copied = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
                         } label: {

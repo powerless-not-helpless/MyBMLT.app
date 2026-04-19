@@ -61,8 +61,12 @@ struct MeetingDetailView: View {
                     .buttonStyle(.bordered)
 
                     Button {
+                        #if os(macOS)
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(clipboardText, forType: .string)
+                        #else
+                        UIPasteboard.general.string = clipboardText
+                        #endif
                         copied = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             copied = false
@@ -202,9 +206,12 @@ struct MeetingDetailView: View {
     private func openInMaps(lat: Double, lon: Double, name: String) {
         let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "maps://?q=\(encoded)&ll=\(lat),\(lon)"
-        if let url = URL(string: urlString) {
-            NSWorkspace.shared.open(url)
-        }
+        guard let url = URL(string: urlString) else { return }
+        #if os(macOS)
+        NSWorkspace.shared.open(url)
+        #else
+        UIApplication.shared.open(url)
+        #endif
     }
 
     private func openMeetingLink(link: String) {
@@ -224,13 +231,21 @@ struct MeetingDetailView: View {
                 zoomString += "&pwd=\(pwd)"
             }
 
-            if let zoomURL = URL(string: zoomString),
-               NSWorkspace.shared.open(zoomURL) {
+            if let zoomURL = URL(string: zoomString) {
+                #if os(macOS)
+                if NSWorkspace.shared.open(zoomURL) { return }
+                #else
+                UIApplication.shared.open(zoomURL)
                 return
+                #endif
             }
         }
 
+        #if os(macOS)
         NSWorkspace.shared.open(webURL)
+        #else
+        UIApplication.shared.open(webURL)
+        #endif
     }
 }
 
