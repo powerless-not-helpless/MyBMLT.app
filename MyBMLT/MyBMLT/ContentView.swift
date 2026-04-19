@@ -18,7 +18,7 @@ struct ContentView: View {
     var filteredMeetings: [Meeting] {
         service.meetings
             .filter { meeting in
-                let matchesDay    = selectedDay   == nil || meeting.weekday        == selectedDay
+                let matchesDay    = selectedDay   == -1  || meeting.weekday        == selectedDay
                 let matchesArea   = selectedArea  == -1  || meeting.serviceBodyId  == selectedArea
                 let matchesVenue  = selectedVenue == -1  ||
                     (selectedVenue == 4
@@ -71,8 +71,8 @@ struct ContentView: View {
                     // Day filter chips
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
-                            DayChip(label: "All", tag: nil, selected: selectedDay)
-                                .onTapGesture { selectedDay = nil }
+                            DayChip(label: "All", tag: -1, selected: selectedDay)
+                                .onTapGesture { selectedDay = -1 }
                             ForEach(1...7, id: \.self) { day in
                                 DayChip(label: dayName(day), tag: day, selected: selectedDay)
                                     .onTapGesture { selectedDay = day }
@@ -254,8 +254,8 @@ struct ContentView: View {
 
 struct DayChip: View {
     let label: String
-    let tag: Int?
-    let selected: Int?
+    let tag: Int
+    let selected: Int
 
     var isSelected: Bool { tag == selected }
 
