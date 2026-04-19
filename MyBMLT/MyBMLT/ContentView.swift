@@ -236,12 +236,6 @@ struct ContentView: View {
                 .tabItem {
                     Label("Visit List", systemImage: "mappin.and.ellipse")
                 }
-
-            // Reconcile Tab
-            ReconcileView(meetings: service.meetings)
-                .tabItem {
-                    Label("Reconcile", systemImage: "arrow.triangle.2.circlepath")
-                }
         }
     }
 
