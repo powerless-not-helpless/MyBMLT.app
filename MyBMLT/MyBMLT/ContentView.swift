@@ -9,9 +9,9 @@ struct ContentView: View {
     @StateObject private var visitListService = VisitListService()
     @EnvironmentObject private var locationService: LocationService
     @State private var searchText = ""
-    @State private var selectedDay: Int? = nil
-    @State private var selectedArea: Int = 1157
-    @State private var selectedVenue: Int = -1
+    @AppStorage("selectedDay")   private var selectedDay:   Int = -1
+    @AppStorage("selectedArea")  private var selectedArea:  Int = -1
+    @AppStorage("selectedVenue") private var selectedVenue: Int = -1
     @State private var selectedMeeting: Meeting? = nil
     @State private var isSearchFocused = false
 
